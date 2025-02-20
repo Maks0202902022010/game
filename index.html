@@ -1,1 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gem Collector 10,000X</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(45deg, #ff6347, #ff8c00);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: white;
+    }
+    .game-container {
+      text-align: center;
+      padding: 40px;
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 25px;
+      box-shadow: 0 15px 60px rgba(0, 0, 0, 0.7);
+      width: 500px;
+    }
+    h1 {
+      font-size: 3.5em;
+      margin-bottom: 40px;
+      font-family: 'Arial', sans-serif;
+    }
+    #gemDisplay {
+      font-size: 2.5em;
+      margin: 20px;
+    }
+    .click-btn {
+      background-color: #ff7f7f;
+      border: none;
+      padding: 25px;
+      font-size: 2em;
+      border-radius: 12px;
+      cursor: pointer;
+      outline: none;
+      transition: transform 0.3s ease, background-color 0.3s;
+    }
+    .click-btn:hover {
+      background-color: #ff8c8c;
+      transform: scale(1.1);
+    }
+    .click-btn:active {
+      transform: scale(0.9);
+    }
+    .upgrade-btn {
+      background-color: #8a2be2;
+      border: none;
+      padding: 18px;
+      font-size: 1.3em;
+      margin-top: 15px;
+      border-radius: 12px;
+      cursor: pointer;
+      outline: none;
+      transition: background-color 0.3s ease;
+    }
+    .upgrade-btn:hover {
+      background-color: #6a0dad;
+    }
+    .prestige-btn {
+      background-color: #f39c12;
+      border: none;
+      padding: 18px;
+      font-size: 1.3em;
+      margin-top: 20px;
+      border-radius: 12px;
+      cursor: pointer;
+      outline: none;
+      transition: background-color 0.3s ease;
+    }
+    .prestige-btn:hover {
+      background-color: #e67e22;
+    }
+    .info {
+      font-size: 1.3em;
+      margin-top: 30px;
+    }
+    .info span {
+      color: #f39c12;
+    }
+    .building-list {
+      margin-top: 25px;
+    }
+    .building-item {
+      background-color: #555;
+      border-radius: 12px;
+      margin: 15px 0;
+      padding: 18px;
+      text-align: left;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .building-item button {
+      padding: 10px 18px;
+      background-color: #ff6347;
+      color: white;
+      font-size: 1.1em;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    .building-item button:hover {
+      background-color: #f66;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="game-container">
+    <h1>Gem Collector 10,000X</h1>
+    <div id="gemDisplay">Gems: 0</div>
+    <button class="click-btn" id="clickGem">Mine Gem!</button>
+    <div class="info">
+      <p>Gems per Click: <span id="gemsPerClick">1</span></p>
+      <p>Gems per second: <span id="gemsPerSecond">0</span></p>
+      <p>Prestige Level: <span id="prestigeLevel">0</span></p>
+      <p>Total Gems Collected: <span id="totalGemsCollected">0</span></p>
+    </div>
+    <div class="building-list">
+      <div class="building-item">
+        <span>Hire Miner (Cost: 100 Gems)</span>
+        <button class="upgrade-btn" id="hireMiner">Hire Miner</button>
+      </div>
+      <div class="building-item">
+        <span>Buy Mine (Cost: 1000 Gems)</span>
+        <button class="upgrade-btn" id="buyMine">Buy Mine</button>
+      </div>
+      <div class="building-item">
+        <span>Upgrade Click Power (Cost: 500 Gems)</span>
+        <button class="upgrade-btn" id="upgradeClick">Upgrade Click Power</button>
+      </div>
+      <div class="building-item">
+        <span>Unlock Elite Miner (Cost: 5000 Gems)</span>
+        <button class="upgrade-btn" id="unlockEliteMiner">Unlock Elite Miner</button>
+      </div>
+      <div class="building-item">
+        <span>Prestige (Cost: 50000 Gems)</span>
+        <button class="prestige-btn" id="prestige">Prestige</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let gems = 0;
+    let gemsPerClick = 1;
+    let gemsPerSecond = 0;
+    let miners = 0;
+    let eliteMiners = 0;
+    let mines = 0;
+    let prestigeLevel = 0;
+    let totalGemsCollected = 0;
+    let clickPowerUpgradeCost = 500;
+    const gemDisplay = document.getElementById('gemDisplay');
+    const gemsPerClickDisplay = document.getElementById('gemsPerClick');
+    const gemsPerSecondDisplay = document.getElementById('gemsPerSecond');
+    const prestigeLevelDisplay = document.getElementById('prestigeLevel');
+    const totalGemsCollectedDisplay = document.getElementById('totalGemsCollected');
+    const clickGemButton = document.getElementById('clickGem');
+    const hireMinerButton = document.getElementById('hireMiner');
+    const buyMineButton = document.getElementById('buyMine');
+    const upgradeClickButton = document.getElementById('upgradeClick');
+    const unlockEliteMinerButton = document.getElementById('unlockEliteMiner');
+    const prestigeButton = document.getElementById('prestige');
+
+    // Update gem display
+    function updateGemDisplay() {
+      gemDisplay.textContent = `Gems: ${gems}`;
+      gemsPerClickDisplay.textContent = gemsPerClick;
+      gemsPerSecondDisplay.textContent = gemsPerSecond;
+      prestigeLevelDisplay.textContent = prestigeLevel;
+      totalGemsCollectedDisplay.textContent = totalGemsCollected;
+    }
+
+    // Click gem to collect
+    clickGemButton.addEventListener('click', () => {
+      gems += gemsPerClick;
+      totalGemsCollected += gemsPerClick;
+      updateGemDisplay();
+    });
+
+    // Hire a miner to collect gems automatically
+    hireMinerButton.addEventListener('click', () => {
+      if (gems >= 100) {
+        gems -= 100;
+        miners += 1;
+        gemsPerSecond += 2;
+        updateGemDisplay();
+      }
+    });
+
+    // Buy a mine to produce gems over time
+    buyMineButton.addEventListener('click', () => {
+      if (gems >= 1000) {
+        gems -= 1000;
+        mines += 1;
+        gemsPerSecond += 10;
+        updateGemDisplay();
+      }
+    });
+
+    // Upgrade click power
+    upgradeClickButton.addEventListener('click', () => {
+      if (gems >= clickPowerUpgradeCost) {
+        gems -= clickPowerUpgradeCost;
+        gemsPerClick *= 2; // Double the gems per click
+        clickPowerUpgradeCost *= 2; // Double the cost for the next upgrade
+        updateGemDisplay();
+      }
+    });
+
+    // Unlock Elite Miner (stronger auto-miner)
+    unlockEliteMinerButton.addEventListener('click', () => {
+      if (gems >= 5000) {
+        gems -= 5000;
+        eliteMiners += 1;
+        gemsPerSecond += 25;
+        updateGemDisplay();
+      }
+    });
+
+    // Prestige system
+    prestigeButton.addEventListener('click', () => {
+      if (gems >= 50000) {
+        prestigeLevel += 1;
+        gems = 0;
+        gemsPerClick = 1 + (prestigeLevel * 1.5); // Incrementally increase click power with each prestige level
+        gemsPerSecond = 0;
+        miners = 0;
+        mines = 0;
+        eliteMiners = 0;
+        totalGemsCollected = 0;
+        alert(`Prestige Level: ${prestigeLevel}!\nYou've gained a bonus to click power and mining!`);
+        updateGemDisplay();
+      }
+    });
+
+    // Automatic gem collection based on miners, mines, and elite miners
+    setInterval(() => {
+      gems += gemsPerSecond;
+      totalGemsCollected += gemsPerSecond;
+      updateGemDisplay();
+    }, 1000);
+
+    // Initial setup
+    updateGemDisplay();
+  </script>
+
+</body>
+</html>
 
