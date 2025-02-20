@@ -56,6 +56,63 @@
             border-radius: 50%;
             opacity: 0.7;
         }
+        .hidden-feature {
+            display: none;
+        }
+        .boss {
+            display: none;
+            width: 200px;
+            height: 200px;
+            background: url('https://i.imgur.com/6hYFb7m.png') no-repeat center;
+            background-size: contain;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+        }
+        .mystery-box {
+            width: 100px;
+            height: 100px;
+            background: url('https://i.imgur.com/3fKTWq6.png') no-repeat center;
+            background-size: contain;
+            position: absolute;
+            top: 20%;
+            left: 40%;
+            cursor: pointer;
+            display: none;
+        }
+        .achievement {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #28a745;
+            padding: 10px;
+            display: none;
+        }
+        .wormhole {
+            position: absolute;
+            top: 25%;
+            left: 50%;
+            width: 200px;
+            height: 200px;
+            background: url('https://i.imgur.com/wormhole.png') no-repeat center;
+            background-size: contain;
+            cursor: pointer;
+            display: none;
+        }
+        .ai-companion {
+            position: fixed;
+            top: 10%;
+            left: 10%;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+            color: white;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
@@ -72,7 +129,16 @@
         <p>Gem Factories: <span id="factory-count">0</span></p>
         <button class="button" onclick="buyTimeMachine()">Buy Time Machine (Cost: <span id="time-machine-cost">1000</span> gems)</button>
         <p>Time Machines: <span id="time-machine-count">0</span></p>
+        <button class="button" onclick="activateGemDuplication()">Activate Gem Duplication</button>
+        <button class="button" onclick="enterSecretLab()">Enter Secret Lab</button>
+        <button class="button" onclick="triggerSupernova()">Trigger Supernova</button>
     </div>
+
+    <div class="wormhole" id="wormhole" onclick="activateWormhole()"></div>
+    <div class="ai-companion" id="ai-companion">AI: "You have unlocked the ultimate gem collector powers!"</div>
+    <div class="mystery-box" id="mystery-box" onclick="openMysteryBox()"></div>
+    <div class="achievement" id="achievement">Achievement Unlocked!</div>
+
     <script>
         let gems = 0;
         let miners = 0;
@@ -81,14 +147,31 @@
         let factoryCost = 100;
         let timeMachines = 0;
         let timeMachineCost = 1000;
-        let developerMode = false;
+        let gemDuplicationActive = false;
+        let supernovaActive = false;
+        let wormholeActive = false;
+        let aiCompanionUnlocked = false;
+        let secretLabUnlocked = false;
+        let bossDefeated = false;
+        let gemInflation = 1;
 
         function collectGem() {
             let extraGems = Math.random() < 0.1 ? 5 : 1;
-            gems += extraGems;
+            if (gemDuplicationActive) {
+                extraGems *= 2;
+            }
+            gems += extraGems * gemInflation;
             document.getElementById('gem-count').innerText = gems;
             animateGem();
             createParticles(event.clientX, event.clientY);
+
+            if (Math.random() < 0.02) {
+                document.getElementById('mystery-box').style.display = 'block';
+            }
+
+            if (gems >= 5000 && !bossDefeated) {
+                summonBoss();
+            }
         }
 
         function buyMiner() {
@@ -148,31 +231,53 @@
             }
         }
 
-        setInterval(() => {
-            gems += miners * 5;
-            gems += factories * 20;
-            gems += timeMachines * 100;
+        function activateGemDuplication() {
+            gemDuplicationActive = true;
+            alert("Gem Duplication Activated! Gems will now double.");
+        }
+
+        function enterSecretLab() {
+            if (secretLabUnlocked) {
+                alert("Entering the Secret Lab... Unlock new powers!");
+            } else {
+                alert("Unlock the Secret Lab first!");
+            }
+        }
+
+        function triggerSupernova() {
+            if (!supernovaActive) {
+                supernovaActive = true;
+                gemInflation = 2;
+                setTimeout(() => {
+                    gemInflation = 1;
+                    supernovaActive = false;
+                }, 10000);
+                alert("Supernova Triggered! Double gems for 10 seconds.");
+            }
+        }
+
+        function summonBoss() {
+            document.querySelector('.boss').style.display = 'block';
+        }
+
+        function openMysteryBox() {
+            let reward = Math.random() < 0.5 ? 'Gem Boost' : 'Time Freeze';
+            alert("You got: " + reward);
+            if (reward === 'Gem Boost') {
+                gems += 1000;
+            }
+            if (reward === 'Time Freeze') {
+                alert("Time has been frozen for 10 seconds! No gems will be lost!");
+            }
+            document.getElementById('mystery-box').style.display = 'none';
             updateUI();
+        }
+
+        setInterval(() => {
+            if (gems >= 5000 && !bossDefeated) {
+                summonBoss();
+            }
         }, 1000);
-
-        console.log("Enter 'unlockDevMode()' in the console to enable developer mode.");
-        function unlockDevMode() {
-            developerMode = true;
-            console.log("Developer mode activated! Use 'addGems(amount)' or 'activateMeteorShower()' to cheat gems.");
-        }
-
-        function addGems(amount) {
-            if (developerMode) {
-                gems += amount;
-                updateUI();
-            }
-        }
-
-        function activateMeteorShower() {
-            if (developerMode) {
-                console.log("Meteor Shower Activated! x10 gem boost for 30 seconds.");
-            }
-        }
     </script>
 </body>
 </html>
